@@ -2,23 +2,31 @@
   (:gen-class))
 
 (defn make-dwarf []
-  {:id (gensym) :tired 0 :hungry 0})
-(def d (make-dwarf))
+  {:id (gensym) :tired 1 :hungry 1})
 
 (defn should-increase-need [need]
-  (< (rand-int 100) (rand-int need)))
+  (and (> 10 need)
+       (< (rand-int 10) 9)))
 
-(defn increase-need [d need]
-  (assoc d need (inc (need d))))
+(defn update-need [need]
+  (if (should-increase-need need)
+    (inc need)
+    need))
 
-(defn update-dwarf [dwarf]
-  (loop [d dwarf
-         need :tired]
-    (if (should-increase-need (need d))
-      (recur d :hungry)
-      (increase-need d :tired))))
-
-(loop)
+(def d (make-dwarf))
+(defn update-dwarf [d]
+  (reduce-kv (fn [acc k v]
+               (if (or (= k :tired)
+                       (= k :hungry))
+                 (assoc acc k (update-need v))
+                 (assoc acc k v)))
+             {}
+             d))
+(loop [x 0
+       d (make-dwarf)]
+  (if (= x 100)
+    d
+    (recur (inc x) (update-dwarf d))))
 
 (defn make-world [n] 1)
 
