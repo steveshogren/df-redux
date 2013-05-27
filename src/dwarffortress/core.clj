@@ -1,6 +1,18 @@
 (ns dwarffortress.core
   (:gen-class))
 
+;;(p25 x y)
+(defmacro make-percents []
+  (let [macro-name (symbol (str "p" 25))
+        x (gensym "x__")
+        y (gensym "y__")]
+    `(defmacro ~macro-name [~x ~y]
+       (if (> 25 (rand-int 100)) ~x ~y))))
+
+(macroexpand '(make-percents))
+(make-percents)
+(p25 (print "x") (print "y"))
+
 ;; todo -> percentage macro generator: maybe (p25 x y)
 (defn chance [x]
   (> x (rand-int 100)))
