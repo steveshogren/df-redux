@@ -3,15 +3,29 @@
 
 ;;(p25 x y)
 (defmacro make-percents []
-  (let [macro-name (symbol (str "p" 25))
-        x (gensym "x__")
-        y (gensym "y__")]
-    `(defmacro ~macro-name [~x ~y]
-       (if (> 25 (rand-int 100)) ~x ~y))))
-
+  `(list ~@(map (fn [num] 
+            (let [macro-name (symbol (str "p" num))
+                  x (gensym "x__")
+                  y (gensym "y__")]
+              `(defmacro ~macro-name [~x ~y]
+                 (if (> ~num (rand-int 100)) ~x ~y))))
+          (range 100))))
 (macroexpand '(make-percents))
+
 (make-percents)
-(p25 (print "x") (print "y"))
+(loop [x1 0
+       y1 0
+       count 0]
+  (if (= count 100)
+    (print (str "x:" x1 " y: " y1))
+    (p50 (do (print "x")
+             (recur (inc x1) y1 (inc count)))
+         (do (print "y")
+             (recur x1 (inc y1) (inc count))))))
+(map (fn [n] (p50 :true :false)) (range 100)) 
+
+(p50 (print "x") (print "y"))
+
 
 ;; todo -> percentage macro generator: maybe (p25 x y)
 (defn chance [x]
