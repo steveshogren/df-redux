@@ -1,16 +1,15 @@
 (ns dwarffortress.core
   (:gen-class))
 
-;;(p25 (x) (y)) calls x 25% of the time
 (defmacro make-percents []
+  "(ifN x y) returns x N% of the time, but ensures conditional evaluation, like 'if'"
   `(list ~@(map (fn [num#] 
-            (let [macro-name# (symbol (str "p" num#))]
+            (let [macro-name# (symbol (str "if" num#))]
               `(defmacro ~macro-name# [x# y#]
                  `(if (> ~~num# (rand-int 100)) ~x# ~y#))))
           (range 100))))
 (make-percents)
 
-;; todo -> percentage macro generator: maybe (p25 x y)
 (defn chance [x]
   (> x (rand-int 100)))
 
@@ -35,7 +34,7 @@
                 (or (= k :tired) (= k :hungry))
                 (assoc acc k (update-need v))
                 (or (= :x k) (= :y k))
-                (assoc acc k (let [new-pos (if (chance 50) (inc v) (dec v))]
+                (assoc acc k (let [new-pos (if50 (inc v) (dec v))]
                                (if (and (chance 50)
                                         (on-board new-pos))
                                  new-pos
@@ -47,7 +46,7 @@
 (defn make-map []
   (take 100
         (for [x (range 10) y (range 10)]
-          [x y (if (> 0.9 (rand 1)) :empty :wall)])))
+          [x y (if90 :empty :wall)])))
 
 (defn draw-cell [c]
   (case c
