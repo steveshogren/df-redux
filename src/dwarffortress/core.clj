@@ -10,6 +10,20 @@
           (range 100))))
 (make-percents)
 
+(defn doer [& x]
+  (if (= 1 (mod (count x) 2))
+    :fail
+    ()))
+'(a 2)
+(pos? '2)
+(reduce-kv (fn [acc k v] #_(if (odd? k)) (conj acc k))
+           []
+           (vec '(1 a 2 b)))
+
+(doer 'a 2) ;:fail
+(doer 1 2 3) ;:fail
+(doer 1 2 3 5)
+
 (defn chance [x]
   (> x (rand-int 100)))
 
