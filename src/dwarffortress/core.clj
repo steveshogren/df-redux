@@ -1,4 +1,5 @@
 (ns dwarffortress.core
+  (:use clojure.test)
   (:gen-class))
 
 (defmacro make-percents []
@@ -13,12 +14,19 @@
 (defn doer [& x]
   (if (= 1 (mod (count x) 2))
     :fail
-    ()))
-'(a 2)
-(pos? '2)
-(reduce-kv (fn [acc k v] #_(if (odd? k)) (conj acc k))
-           []
-           (vec '(1 a 2 b)))
+    (let [roll (rand-int 100) 
+      percents (reduce-kv
+                (fn [acc k v]
+                  (if (or (zero? k) (even? k))
+                    (conj acc v)
+                    acc))
+                []
+                (vec x))]
+      (if (= 100 (reduce + (filter pos? percents)))
+        :true
+        :fail))))
+(= 2 (with-redefs [rand-int (fn [] 5)]
+       (doer 50 2 50 4)))
 
 (doer 'a 2) ;:fail
 (doer 1 2 3) ;:fail
