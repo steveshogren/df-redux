@@ -1,46 +1,9 @@
 (ns dwarffortress.core
-  (:use clojure.test)
+  (:use [clojure.test]
+        [dwarffortress.percentages :only (make-percents)])
   (:gen-class))
 
-(defmacro make-percents []
-  "(ifN x y) returns x N% of the time, but ensures conditional evaluation, like 'if'"
-  `(list ~@(map (fn [num#] 
-            (let [macro-name# (symbol (str "if" num#))]
-              `(defmacro ~macro-name# [x# y#]
-                 `(if (> ~~num# (rand-int 100)) ~x# ~y#))))
-          (range 100))))
 (make-percents)
-
-(defn doer [& x]
-  (if (= 1 (mod (count x) 2))
-    :fail
-    (let [roll (rand-int 100) 
-          pairs (partition 2 x)]
-      (if (= 100 (reduce + (filter pos? (map first pairs))))
-        (loop [ipairs pairs
-               total 0]
-          (let [[percent ret] (first ipairs)
-                next-tot (+ total percent)]
-            (if (< roll next-tot)
-              ret
-              (recur (rest ipairs) next-tot))))
-        :fail))))
-
-(= 2 (with-redefs [rand-int (fn [x] 5)]
-       (doer 50 2 50 4)))
-(= 4 (with-redefs [rand-int (fn [x] 51)]
-       (doer 50 2 50 4)))
-(= :fail (with-redefs [rand-int (fn [x] 51)]
-       (doer 50 :a 50 :b 50 :c)))
-(= :c (with-redefs [rand-int (fn [x] 75)]
-       (doer 50 :a 25 :b 25 :c)))
-
-(doer 'a 2) ;:fail
-(doer 1 2 3) ;:fail
-(doer 1 2 3 5)
-
-;; (reduce-kv (fn [acc k v] (str acc k v)) "" {:1 'a})
-;; (reduce-kv (fn [acc k v] (str acc k v)) "" '[a b])
 
 (defn chance [x]
   (> x (rand-int 100)))
