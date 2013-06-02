@@ -9,7 +9,7 @@
           (range 100))))
 (make-percents)
 
-(defmacro doer [& x]
+(defmacro if-percent [& x]
   `(if (= 1 (mod (count ~x) 2))
     :fail
     (let [roll# (rand-int 100) 
