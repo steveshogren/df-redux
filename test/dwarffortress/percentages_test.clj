@@ -14,9 +14,3 @@
                (if-percent 50 (+ 2 2) 50 (+ 2 4)))))))
 ;; (macroexpand '(if-percent 50 2 50 5))
 
-
-      
-
-
-;; (reduce-kv (fn [acc k v] (str acc k v)) "" {:1 'a})
-;; (reduce-kv (fn [acc k v] (str acc k v)) "" '[a b])
