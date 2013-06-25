@@ -25,25 +25,22 @@
                (recur (rest ipairs#) next-tot#))))
          :fail)))) ;; nums have to = 100
 
+;;(sum-up-pair-percents '((50 (+ 1 1)) (50 :f))) 
 (defn sum-up-pair-percents [pairs]
+  "Sums up the pairs of percents and results,
+   adding the total to each percent"
   (loop [sum 0
          ipairs pairs
          opairs []]
-    (print "ipairs:" ipairs "\n")
-    (print "opairs:" opairs "\n")
     (let [[num val] (first ipairs)
           next-sum (+ num sum)
-          updated-pair [next-sum val]]
-      (print "num: " num "\n")
-      (print "next-sum: " next-sum "\n")
-      (print "updated-pair: " updated-pair "\n")
-      (if (empty? ipairs)
-        updated-pair
+          updated-pair [next-sum val]
+          updated-opair (cons updated-pair opairs)]
+      (if (empty? (rest ipairs))
+        (reverse updated-opair)
         (recur next-sum
                (rest ipairs)
-               (cons updated-pair opairs))))))
-
-(sum-up-pair-percents '((50 :t) (50 :f)))
+               updated-opair)))))
 
 (defmacro if-percent [& n#]
   #_(print (partition 2 n#))
