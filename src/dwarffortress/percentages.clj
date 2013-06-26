@@ -7,7 +7,6 @@
               `(defmacro ~macro-name# [x# y#]
                  `(if (> ~~num# (rand-int 100)) ~x# ~y#))))
           (range 100))))
-(make-percents)
 
 ;;(sum-up-pair-percents '((50 (+ 1 1)) (50 :f))) 
 (defn sum-up-pair-percents [pairs]

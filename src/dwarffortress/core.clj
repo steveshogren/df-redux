@@ -1,9 +1,7 @@
 (ns dwarffortress.core
   (:use [clojure.test]
-        [dwarffortress.percentages :only (make-percents)])
+        [dwarffortress.percentages])
   (:gen-class))
-
-(make-percents)
 
 (defn chance [x]
   (> x (rand-int 100)))
@@ -29,7 +27,7 @@
                 (or (= k :tired) (= k :hungry))
                 (assoc acc k (update-need v))
                 (or (= :x k) (= :y k))
-                (assoc acc k (let [new-pos (if50 (inc v) (dec v))]
+                (assoc acc k (let [new-pos (if-percent 50 (inc v) 50 (dec v))]
                                (if (and (chance 50)
                                         (on-board new-pos))
                                  new-pos
@@ -41,7 +39,7 @@
 (defn make-map []
   (take 100
         (for [x (range 10) y (range 10)]
-          [x y (if90 :empty :wall)])))
+          [x y (if-percent 90 :empty 10 :wall)])))
 
 (defn draw-cell [c]
   (case c
