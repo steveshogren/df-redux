@@ -1,5 +1,8 @@
 (ns dwarffortress.percentages)
 
+(defn chance [x]
+  (> x (rand-int 100)))
+
 (defmacro make-percents []
   "(ifN x y) returns x N% of the time, but ensures conditional evaluation, like 'if'"
   `(list ~@(map (fn [num#] 
