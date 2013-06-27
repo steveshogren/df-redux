@@ -15,10 +15,11 @@
 
 (defn draw-world [w d]
   (println
-   (reduce (fn [acc [x y v]]
+   (reduce (fn [acc {x :x y :y z :z v :val}]
              (if (and (= x (:x d)) (= y (:y d)))
                (add-cell-drawing acc (draw-dwarf d) y)
                (add-cell-drawing acc (draw-cell v) y)))
            "" 
            w)))
+
 
