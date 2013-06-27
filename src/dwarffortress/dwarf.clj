@@ -1,6 +1,9 @@
 (ns dwarffortress.dwarf
   (:use [dwarffortress.percentages]))
 
+(defn make-dwarf []
+  {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1})
+
 (defn should-increase-need [need]
   (and (> 10 need)
        (chance 10)))
