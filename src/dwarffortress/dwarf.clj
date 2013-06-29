@@ -1,6 +1,10 @@
 (ns dwarffortress.dwarf
   (:use [dwarffortress.percentages]))
 
+(defn next-cell-toward [{x :x y :y} {toX :x toY :y}]
+  )
+(next-cell-toward {:x 1 :y 1} {:x 3 :y 3}) ; [2 2]
+
 (defn make-dwarf []
   {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1 :z 6})
 
