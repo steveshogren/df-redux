@@ -1,19 +1,18 @@
 (ns dwarffortress.dwarf
   (:use [dwarffortress.percentages]))
 
-(defn moveIfGreater [from to]
+(defn move-if-greater [from to]
   (cond
    (= from to) from
    (< from to) (+ from 1)
    (> from to) (- from 1)))
 
-(defn next-cell-toward [{x :x y :y} {toX :x toY :y}]
-  [(moveIfGreater x toX)
-   (moveIfGreater y toY)])
-
-(next-cell-toward {:x 1 :y 1} {:x 3 :y 3}) ; [2 2]
-(next-cell-toward {:x 1 :y 1} {:x 8 :y 8}) ; [2 2]
-(next-cell-toward {:x 1 :y 8} {:x 8 :y 8}) ; [2 8]
+(defn next-cell-toward
+  ;;"Give the next cell within 1 block closest"
+  ([{x :x y :y} {toX :x toY :y} blockages]
+     ([]))
+  ([cell cell2]
+     (next-cell-toward cell cell2 [])))
 
 (defn make-dwarf []
   {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1 :z 6})
