@@ -3,11 +3,18 @@
         [dwarffortress.ui :only (draw-world)]
         [dwarffortress.dwarf]
         [dwarffortress.map]
-        [dwarffortress.percentages])
+        [dwarffortress.percentages]
+        #_[seesaw.core])
   (:gen-class))
 
 (defn -main
   [& args]
+  #_(invoke-later
+   (-> (frame :title "heelo",
+              :content "hello seesaw",
+              :on-close :exit)
+       pack!
+       show!))
   (loop [map (make-map)
          dwarf (make-dwarf)
          level 6]

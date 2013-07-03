@@ -10,7 +10,7 @@
 (defn next-cell-toward
   ;;"Give the next cell within 1 block closest"
   ([{x :x y :y} {toX :x toY :y} blockages]
-     ([]))
+     [(move-if-greater x toX) (move-if-greater y toY)])
   ([cell cell2]
      (next-cell-toward cell cell2 [])))
 
