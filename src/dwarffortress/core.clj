@@ -20,7 +20,7 @@
          level 6]
     (draw-world map dwarf level)
     (let [inp (read-line)]
-      (recur map (update-dwarf dwarf) 
+      (recur map (update-dwarf dwarf map) 
              (case inp
                "p" (if (= 9 level) level (+ 1 level))
                "n" (if (= 0 level) level (- 1 level))

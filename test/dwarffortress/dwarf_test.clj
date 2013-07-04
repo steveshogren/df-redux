@@ -19,5 +19,17 @@
 (deftest should-fall?-test
   (testing "should-fall? tests"
     (is (= true (should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :empty}])))
+    (is (= true (should-fall? {:x 1 :y 1 :z 5}
+                              [{:x 1 :y 1 :z 3 :val :wall}
+                               {:x 1 :y 1 :z 4 :val :empty}])))
     (is (= false (should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :wall}])))))
 
+(deftest update-dwarf-test
+  (testing "update-dwarf tests"
+    (is (= 4 (:z (update-dwarf
+                  {:x 1 :y 1 :z 5}
+                  [{:x 1 :y 1 :z 4 :val :empty}]))))
+    (is (= 5 (:z (update-dwarf
+                  {:x 1 :y 1 :z 5}
+                  [{:x 1 :y 1 :z 4 :val :wall}]))))
+    ))

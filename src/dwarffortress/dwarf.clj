@@ -14,20 +14,18 @@
   ([cell cell2]
      (next-cell-toward cell cell2 [])))
 
-(defn find-cell [{cellx :x celly :y} map]
-  (first (filter (fn [{x :x y :y}]
-                   (and (= x cellx) (= y celly)))
+(defn find-cell [{cellx :x celly :y cellz :z} map]
+  (first (filter (fn [{x :x y :y z :z}]
+                   (and (= x cellx) (= y celly) (= z cellz)))
                  map)))
 
 (defn should-fall? [{x :x y :y z :z} map]
-  (= :empty (:val (find-cell {:x x :y y :z (- z 1)} map))))
-
-
-(should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :empty}])
-(should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :wall}])
+  (-> (find-cell {:x x :y y :z (- z 1)} map)
+    :val
+    (= :empty)))
 
 (defn make-dwarf []
-  {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1 :z 6})
+  {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1 :z 8})
 
 (defn should-increase-need [need]
   (and (> 10 need)
@@ -41,17 +39,26 @@
 (defn on-board [x]
   (and (<= x 10) (>= x 0)))
 
-(defn update-dwarf [d]
+(defn move-rand [v d map]
+  (if (not (should-fall? d map))
+    (let [new-pos (if-percent 50 (inc v) 50 (dec v))]
+      (if (and (chance 50)
+               (on-board new-pos))
+        new-pos
+        v))
+    v))
+
+(defn apply-gravity [d map]
+  (if (should-fall? d map)
+    (-> d :z (- 1))
+    (:z d)))
+
+(defn update-dwarf [d map]
   (reduce-kv (fn [acc k v]
                (cond
-                (or (= k :tired) (= k :hungry))
-                (assoc acc k (update-need v))
-                (or (= :x k) (= :y k))
-                (assoc acc k (let [new-pos (if-percent 50 (inc v) 50 (dec v))]
-                               (if (and (chance 50)
-                                        (on-board new-pos))
-                                 new-pos
-                                 v)))
+                (or (= k :tired) (= k :hungry)) (assoc acc k (update-need v))
+                (or (= :x k) (= :y k)) (assoc acc k (move-rand v d map))
+                (= :z k) (assoc acc k (apply-gravity d map))
                 :else (assoc acc k v)))
              {}
              d))
