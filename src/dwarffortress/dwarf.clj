@@ -14,6 +14,18 @@
   ([cell cell2]
      (next-cell-toward cell cell2 [])))
 
+(defn find-cell [{cellx :x celly :y} map]
+  (first (filter (fn [{x :x y :y}]
+                   (and (= x cellx) (= y celly)))
+                 map)))
+
+(defn should-fall? [{x :x y :y z :z} map]
+  (= :empty (:val (find-cell {:x x :y y :z (- z 1)} map))))
+
+
+(should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :empty}])
+(should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :wall}])
+
 (defn make-dwarf []
   {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1 :z 6})
 

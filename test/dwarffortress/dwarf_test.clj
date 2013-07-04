@@ -15,3 +15,9 @@
                                     {:x 5 :y 4}
                                     {:x 5 :y 3}])))
     (is (= [2 8] (next-cell-toward {:x 1 :y 8} {:x 8 :y 8})))))
+
+(deftest should-fall?-test
+  (testing "should-fall? tests"
+    (is (= true (should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :empty}])))
+    (is (= false (should-fall? {:x 1 :y 1 :z 5} [{:x 1 :y 1 :z 4 :val :wall}])))))
+
