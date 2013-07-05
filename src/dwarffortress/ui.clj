@@ -3,7 +3,7 @@
 (defn draw-ground [c]
   (case c
     :empty " "
-    :wall "X"))
+    :granite "X"))
 
 (defn draw-dwarf [d]
   (cond
