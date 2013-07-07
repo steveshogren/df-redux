@@ -22,10 +22,8 @@
              (map (fn [cell]
                     (if (cell-match? cell dwarf)
                       (draw-dwarf dwarf)
-                      (draw-ground v)))
+                      (draw-ground (:val cell))))
                   (filter #(this-level? %1 level) w))))
-
-(get-world (make-map) {:x 1 :y 2 :z 1} 1)
 
 (defn draw-world [w dwarf level]
   (map println (get-world w dwarf level)))
