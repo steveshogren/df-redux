@@ -48,7 +48,6 @@
         vect# (rest args#)]
     `(def ~name# ~@vect#)))
 
-(def Account [:test])
 
 (defn is-type [coll type]
   (reduce (fn [ret k]
@@ -58,23 +57,38 @@
           type))
 
 (defmacro defnt [name# args# rett# body#]
-   "(defnt addPayment
-     [payment : Payment, account : Account] Account
-     (body returns 'Account' map...))"
+  "defnt [name [param Type*] Type body]
+   (defnt walk [duck Duck] Duck
+     (body must return duck shape...))"
   (if (= 0 (mod (count args#) 2))
-    (let [argnames# (vec (map first (partition 2 args#)))]
+    (let [argpairs# (partition 2 args#)
+          argnames# (vec (map first argpairs#))
+          argtypes# (vec (map second argpairs#))]
       `(defn ~name#  ~argnames#
-         (let [ret# ~body#]
-           (if (is-type ret# ~rett#)
-             ret#
-             :wrongtypereturned))))
+         (if (reduce (fn [oret# pair#] 
+                       (and oret# (is-type (first pair#) (second pair#))))
+                     true
+                     (map vector ~argnames# ~argtypes#)) ;; all params match type
+           (let [ret# ~body#]
+             (if (is-type ret# ~rett#)
+               ret#
+               :wrongtypereturned))
+           :argsdontmatchtypes)))
     :missingtypesfail))
 
-(defnt test [account Account pay Pay] Account
-  {:test (+ 1 2)})
-(test 1 2) ;; {:test 3}
-(defnt test [account Account pay Pay] Account
+(def Account [:test])
+(def Pay [:this])
+(pprint (macroexpand '(defnt test [account Account pay Pay] Account
+                   {:test (+ (:test account) (:this pay))})))
+
+(defnt adds [account Account pay Pay] Account
+  {:test (+ (:test account) (:this pay))})
+
+(adds {:test 2} {:this 2}) ;; {:test 4}
+(adds 1 2) ;; argsdontmatchtypes...
+
+(defnt wrongRet [account Account pay Pay] Account
   (+ 1 2)) 
-(test 1 2) ;; wrongtypereturned... 
+(wrongRet 1 2) ;; wrongtypereturned... 
 
 
