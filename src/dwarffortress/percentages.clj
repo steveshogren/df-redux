@@ -42,5 +42,39 @@
                      (sum-up-pair-percents pairs#))))
          (throw (Exception. (str "Nums: " ~sum# " didn't equal 100" )))))))
 
+(defmacro deft [& args#]
+  "(deft Account [:total :id])"
+  (let [name# (symbol (str (first args#) "-TYPE"))
+        vect# (rest args#)]
+    `(def ~name# ~@vect#)))
+
+(def Account [:test])
+
+(defn is-type [coll type]
+  (reduce (fn [ret k]
+            (and ret
+                 (contains? coll k)))
+          true
+          type))
+
+(defmacro defnt [name# args# rett# body#]
+   "(defnt addPayment
+     [payment : Payment, account : Account] Account
+     (body returns 'Account' map...))"
+  (if (= 0 (mod (count args#) 2))
+    (let [argnames# (vec (map first (partition 2 args#)))]
+      `(defn ~name#  ~argnames#
+         (let [ret# ~body#]
+           (if (is-type ret# ~rett#)
+             ret#
+             :wrongtypereturned))))
+    :missingtypesfail))
+
+(defnt test [account Account pay Pay] Account
+  {:test (+ 1 2)})
+(test 1 2) ;; {:test 3}
+(defnt test [account Account pay Pay] Account
+  (+ 1 2)) 
+(test 1 2) ;; wrongtypereturned... 
 
 
