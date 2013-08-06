@@ -76,8 +76,8 @@
                                          true
                                          type#))]
       `(defn ~name#
-         #_{:arglists (vec (mapcat (fn [x#] x#) (map vector '~argnames# ~argtypes#)))}
-        {:doc (str (vec (mapcat (fn [x#] x#) (map vector '~argnames# ~argtypes#)))" -> " ~rett# "\n  " ~doc#)}
+         {:arglists (list (symbol (str (vec (mapcat (fn [x#] x#) (map vector '~argnames# ~argtypes#)))" -> " ~rett#)))
+          :doc ~doc#}
          ~cleanedArgs#
          (if check-types-in-deft
            (if (reduce (fn [oret# pair#] 
@@ -100,7 +100,9 @@
 (pprint (macroexpand
 '(deft adds "Adds a payment to an account" [account Account pay Pay] Account
   (assoc account :balance (+ (:amount pay) (:balance account))))))
-(deft adds "Adds a payment to an account" [account Account pay Pay] Account
+
+(deft adds "Adds a payment to an account"
+  [account Account pay Pay] Account
   (assoc account :balance (+ (:amount pay) (:balance account))))
 (adds {:balance 2 :id 1} {:amount 2}) 
 ;; {:balance 4 :id 1}
