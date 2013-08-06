@@ -24,7 +24,9 @@
     :val
     (= :empty)))
 
-(defn make-dwarf []
+(def Dwarf [:id :tired :hungry :weapon :health :x :y :z])
+
+(deft make-dwarf [] Dwarf
   {:id (gensym) :tired 1 :hungry 1 :weapon :sword :health 1 :x 1 :y 1 :z 8})
 
 (defn should-increase-need [need]

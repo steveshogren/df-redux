@@ -42,53 +42,70 @@
                      (sum-up-pair-percents pairs#))))
          (throw (Exception. (str "Nums: " ~sum# " didn't equal 100" )))))))
 
-(defmacro deft [& args#]
-  "(deft Account [:total :id])"
-  (let [name# (symbol (str (first args#) "-TYPE"))
-        vect# (rest args#)]
-    `(def ~name# ~@vect#)))
 
-
-(defn is-type [coll type]
+(defn is-type2 [coll type]
   (reduce (fn [ret k]
             (and ret
                  (contains? coll k)))
           true
           type))
 
-(defmacro defnt [name# args# rett# body#]
+(def check-types-in-deft true)
+
+(defmacro deft [name# args# rett# body#]
   "defnt [name [param Type*] Type body]
    (defnt walk [duck Duck] Duck
      (body must return duck shape...))"
   (if (= 0 (mod (count args#) 2))
     (let [argpairs# (partition 2 args#)
           argnames# (vec (map first argpairs#))
-          argtypes# (vec (map second argpairs#))]
+          argtypes# (vec (map second argpairs#))
+          is-type# (fn [coll# type#] (reduce (fn [iret# k#]
+                                           (and iret#
+                                                (contains? coll# k#)))
+                                         true
+                                         type#))]
       `(defn ~name#  ~argnames#
-         (if (reduce (fn [oret# pair#] 
-                       (and oret# (is-type (first pair#) (second pair#))))
-                     true
-                     (map vector ~argnames# ~argtypes#)) ;; all params match type
-           (let [ret# ~body#]
-             (if (is-type ret# ~rett#)
-               ret#
-               :wrongtypereturned))
-           :argsdontmatchtypes)))
+         (if check-types-in-deft
+           (if (reduce (fn [oret# pair#] 
+                         (and oret# (~is-type# (first pair#) (second pair#))))
+                       true
+                       (map vector ~argnames# ~argtypes#)) ;; all params match type
+             (let [ret# ~body#]
+               (if (~is-type# ret# ~rett#)
+                 ret#
+                 :wrongtypereturned))
+             :argsdontmatchtypes)
+           ~body#)))
     :missingtypesfail))
 
-(def Account [:test])
-(def Pay [:this])
-(pprint (macroexpand '(defnt test [account Account pay Pay] Account
-                   {:test (+ (:test account) (:this pay))})))
+(def Account [:id :balance])
+(def Pay [:amount])
 
-(defnt adds [account Account pay Pay] Account
-  {:test (+ (:test account) (:this pay))})
+(deft adds [account Account pay Pay] Account
+  (assoc account :balance (+ (:amount pay) (:balance account))))
 
-(adds {:test 2} {:this 2}) ;; {:test 4}
-(adds 1 2) ;; argsdontmatchtypes...
+(adds {:balance 2 :id 1} {:amount 2}) 
+;; {:balance 4 :id 1}
 
-(defnt wrongRet [account Account pay Pay] Account
+(adds {:balance 2} {:amount 2})
+;; :argsdontmatchtypes
+
+(deft wrongRet [account Account pay Pay] Account
   (+ 1 2)) 
-(wrongRet 1 2) ;; wrongtypereturned... 
+(wrongRet {:balance 2 :id 1} {:amount 2})
+;; :wrongtypereturned 
+
+;;Disable all type checking
+(def check-types-in-defnt false)
+(adds 2 2)
+;; NullPointerException
+
+;; You can disable/circumvent typeshape checking
+;; by simply using an empty vec for a "type".
+;; No keywords, nothing to check
+(deft noTypes [num [] account [:balance]] []
+  (+ num (:balance account)))
+(noTypes 1 {:balance 1}) ;;2
 
 

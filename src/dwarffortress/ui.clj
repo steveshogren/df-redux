@@ -1,5 +1,7 @@
 (ns dwarffortress.ui
-  (:use [dwarffortress.map]))
+  (:use [dwarffortress.map]
+        [dwarffortress.percentages]
+        [dwarffortress.dwarf]))
 
 (defn draw-ground [c]
   (case c
@@ -17,7 +19,7 @@
 
 (defn this-level? [{z1 :z} z2] (= z1 z2))
 
-(defn get-world [w dwarf level]
+(deft get-world [w [] dwarf Dwarf level []] []
   (partition 10
              (map (fn [cell]
                     (if (cell-match? cell dwarf)
