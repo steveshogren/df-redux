@@ -52,6 +52,8 @@
 
 (def check-types-in-deft true)
 
+(defn rand-string [x] (symbol (str "auto_" (rand-int 1000000))))
+
 (defmacro deft [name# args# rett# body#]
   "defnt [name [param Type*] Type body]
    (defnt walk [duck Duck] Duck
@@ -60,28 +62,33 @@
     (let [argpairs# (partition 2 args#)
           argnames# (vec (map first argpairs#))
           argtypes# (vec (map second argpairs#))
+          cleanedArgs# (vec (map rand-string argnames#))
+          putBackArgs# (mapcat (fn [x] x) (map vector argnames# cleanedArgs#))
           is-type# (fn [coll# type#] (reduce (fn [iret# k#]
                                            (and iret#
                                                 (contains? coll# k#)))
                                          true
                                          type#))]
-      `(defn ~name#  ~argnames#
+      `(defn ~name#  ~cleanedArgs#
+         
          (if check-types-in-deft
            (if (reduce (fn [oret# pair#] 
                          (and oret# (~is-type# (first pair#) (second pair#))))
                        true
-                       (map vector ~argnames# ~argtypes#)) ;; all params match type
-             (let [ret# ~body#]
+                       (map vector ~cleanedArgs# ~argtypes#)) ;; all params match type
+             (let [~@putBackArgs#
+                   ret# ~body#]
                (if (~is-type# ret# ~rett#)
                  ret#
                  :wrongtypereturned))
              :argsdontmatchtypes)
-           ~body#)))
+           (let [~@putBackArgs#]
+             ~body#))))
     :missingtypesfail))
+
 
 (def Account [:id :balance])
 (def Pay [:amount])
-
 (deft adds [account Account pay Pay] Account
   (assoc account :balance (+ (:amount pay) (:balance account))))
 
@@ -103,9 +110,19 @@
 
 ;; You can disable/circumvent typeshape checking
 ;; by simply using an empty vec for a "type".
-;; No keywords, nothing to check
+;; No keywords, nothing to check, empty vec is our Unit
 (deft noTypes [num [] account [:balance]] []
   (+ num (:balance account)))
 (noTypes 1 {:balance 1}) ;;2
+
+;; You can still destructure parameters
+(def Coord [:x :y])
+(deft addX [pos Coord {x :x} Coord] Coord 
+  (assoc pos :x (+ x (:x pos))))
+
+(addX {:x 1 :y 100} {:x 1 :y 100 :z 40})
+
+
+
 
 
