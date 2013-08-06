@@ -54,10 +54,16 @@
 
 (defn rand-string [x] (symbol (str "auto_" (rand-int 1000000))))
 
-(defmacro deft [name# args# rett# body#]
-  "defnt [name [param Type*] Type body]
+;; (defmacro deft [name# &args# rett# body#]
+(defmacro deft [name# & rest#]
+  "defnt [name doc? [param Type*] Type body]
    (defnt walk [duck Duck] Duck
      (body must return duck shape...))"
+  (let [hasDoc# (string? (first rest#))
+        doc# (if hasDoc# (first rest#) "")
+        args# (if hasDoc# (second rest#) (first rest#))
+        rett# (if hasDoc# (nth rest# 2) (second rest#))
+        body# (last rest#)]
   (if (= 0 (mod (count args#) 2))
     (let [argpairs# (partition 2 args#)
           argnames# (vec (map first argpairs#))
@@ -69,8 +75,10 @@
                                                 (contains? coll# k#)))
                                          true
                                          type#))]
-      `(defn ~name#  ~cleanedArgs#
-         
+      `(defn ~name#
+         #_{:arglists (vec (mapcat (fn [x#] x#) (map vector '~argnames# ~argtypes#)))}
+        {:doc (str (vec (mapcat (fn [x#] x#) (map vector '~argnames# ~argtypes#)))" -> " ~rett# "\n  " ~doc#)}
+         ~cleanedArgs#
          (if check-types-in-deft
            (if (reduce (fn [oret# pair#] 
                          (and oret# (~is-type# (first pair#) (second pair#))))
@@ -84,14 +92,16 @@
              :argsdontmatchtypes)
            (let [~@putBackArgs#]
              ~body#))))
-    :missingtypesfail))
+    :missingtypesfail)))
 
 
 (def Account [:id :balance])
 (def Pay [:amount])
-(deft adds [account Account pay Pay] Account
+(pprint (macroexpand
+'(deft adds "Adds a payment to an account" [account Account pay Pay] Account
+  (assoc account :balance (+ (:amount pay) (:balance account))))))
+(deft adds "Adds a payment to an account" [account Account pay Pay] Account
   (assoc account :balance (+ (:amount pay) (:balance account))))
-
 (adds {:balance 2 :id 1} {:amount 2}) 
 ;; {:balance 4 :id 1}
 
@@ -117,12 +127,9 @@
 
 ;; You can still destructure parameters
 (def Coord [:x :y])
-(deft addX [pos Coord {x :x} Coord] Coord 
+(deft addX "Adds a Coord x value to Coord" [pos Coord {x :x} Coord] Coord 
   (assoc pos :x (+ x (:x pos))))
 
-(addX {:x 1 :y 100} {:x 1 :y 100 :z 40})
-
-
-
+(addX {:x 1 :y 100} {:x 1 :y 100 :z 40}) ;;{:y 100 :x 2}
 
 
