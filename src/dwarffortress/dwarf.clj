@@ -1,5 +1,6 @@
 (ns dwarffortress.dwarf
-  (:use [dwarffortress.percentages]))
+  (:use [deft.core]
+        [dwarffortress.percentages]))
 
 (defn move-if-greater [from to]
   (cond

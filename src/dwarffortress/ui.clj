@@ -1,5 +1,6 @@
 (ns dwarffortress.ui
   (:use [dwarffortress.map]
+        [deft.core]
         [dwarffortress.percentages]
         [dwarffortress.dwarf]))
 

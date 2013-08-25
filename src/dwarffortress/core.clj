@@ -1,6 +1,7 @@
 (ns dwarffortress.core
   (:use [clojure.test]
         [dwarffortress.ui :only (get-world)]
+        [dwarffortress.ui :only (get-world)]
         [dwarffortress.dwarf]
         [dwarffortress.map]
         [dwarffortress.percentages]
