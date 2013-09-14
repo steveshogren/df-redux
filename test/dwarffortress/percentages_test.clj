@@ -5,6 +5,15 @@
 (deftest if-percent-test
   (testing "if-percent method"
     (is (= :b (with-redefs [rand-int (fn [x] 75)]
+                (if-percent-fn 50 :a 25 (fn [] :b) 25 :c))))
+    (is (thrown? Exception (with-redefs [rand-int (fn [x] 51)]
+                             (if-percent-fn 50 :a 50 :b 50 :c))))
+    (is (= 4 (with-redefs [rand-int (fn [x] 51)]
+               (if-percent-fn 50 2 50 (fn [] 4)))))
+    (is (= 2 (with-redefs [rand-int (fn [x] 5)]
+               (if-percent-fn 50 #(+ 1 1) 50 #(throw (Exception. "SHOULDNT CALL")))))))
+  (testing "if-percent method"
+    (is (= :b (with-redefs [rand-int (fn [x] 75)]
                 (if-percent 50 :a 25 :b 25 :c))))
     (is (thrown? Exception (with-redefs [rand-int (fn [x] 51)]
                                  (if-percent 50 :a 50 :b 50 :c))))

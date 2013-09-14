@@ -27,18 +27,57 @@
                (rest ipairs)
                updated-pair)))))
 
-(defmacro if-percent [& n#]
+(defn if-percent-fn [& n]
+  (if (= 1 (mod (count n) 2))
+    (throw (Exception. "Must pass even num of args"))
+    (let [pairs (partition 2 n)
+          sum (reduce + (filter pos? (map first pairs)))]
+      (if (= 100 sum)
+        (let [roll (rand-int 100)]
+          (loop [current-sum 0
+                 items pairs]
+            (let [[next-percent next-val] (first items)
+                  current-sum (+ current-sum next-percent)]
+              (if (<= roll current-sum)
+                (next-val)
+                (if (> current-sum 100)
+                  (throw (Exception. (str "Something didn't add up")))
+                  (recur current-sum (rest items)))))))
+        (throw (Exception. (str "Nums: " sum " didn't equal 100" )))))))
+
+(defn wrap-in-fn [x]
+  (fn [] x))
+
+(defn pair-flatten [col]
+  "(pair-flatten [[1 [2]] [3 4] [5 6]]) -> [1 [2] 3 4 5 6]"
+  (reduce (fn [items [x y]] (conj items x y))
+          []
+          col))
+
+(defmacro if-percent [& n]
   "(if-percent 50 :a 49 :b 1 :c) returns :a 50% of the time, :b 49%, and :c 1%"
-  (if (= 1 (mod (count n#) 2))
-     (throw (Exception. "Must pass even num of args"))
-     (let [pairs# (partition 2 n#)
-           roll (gensym "roll")
-           sum# (reduce + (filter pos? (map first pairs#)))]
-       `(if (= 100 ~sum#)
-         (let [~roll (rand-int 100)]
-            (cond
-             ~@(mapcat (fn [[per# val#]]
-                       (list `(<= ~roll ~per#) val#))
-                     (sum-up-pair-percents pairs#))))
-         (throw (Exception. (str "Nums: " ~sum# " didn't equal 100" )))))))
+  (if (= 0 (mod (count n) 2))
+    (let [pairs (partition 2 n)
+          pairs (mapcat (fn [x] [(first x) (fn [] (second x))]) pairs)]
+      `(if-percent-fn ~@pairs))))
+
+(pprint (macroexpand '(if-percent 50 (+ 1 1) 50 :b)))
+(if-percent 50 (+ 1 1) 50 (+ 2 2))
+
+;; Transliteration of PG's aif
+;; Anaphoric macro that binds to "it" the test result
+(defmacro aif [test then else]
+  `(let [~'it ~test]
+     (if ~'it ~then ~else)))
+
+(def it 2)
+(aif (= it 2)
+     (do (print (str "it: " it)) it)
+     :false)
+
+;; Transliteration of PG's alambda
+(defmacro alambda [parms & body]
+  `(let [~'self (fn ~parms ~@body)]
+     ~'self))
+((alambda [a b] (+ a b)) 1 2)
 
