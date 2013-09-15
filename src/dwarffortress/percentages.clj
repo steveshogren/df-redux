@@ -70,14 +70,19 @@
   `(let [~'it ~test]
      (if ~'it ~then ~else)))
 
-(def it 2)
 (aif (= it 2)
      (do (print (str "it: " it)) it)
      :false)
 
 ;; Transliteration of PG's alambda
 (defmacro alambda [parms & body]
-  `(let [~'self (fn ~parms ~@body)]
+  `(letfn [(~'self ~parms ~@body)]
      ~'self))
 ((alambda [a b] (+ a b)) 1 2)
+
+((alambda [n]
+       (if (> n 0)
+         (cons
+          n
+          (self (- n 1))))) 5)
 
