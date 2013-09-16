@@ -81,8 +81,21 @@
 ((alambda [a b] (+ a b)) 1 2)
 
 ((alambda [n]
-       (if (> n 0)
-         (cons
-          n
-          (self (- n 1))))) 5)
+     (if (> n 0)
+       (cons
+        n
+        (self (- n 1))))) 5)
+
+(defmacro _> [init & body]
+  "Used to anaphorically fill _ with the result of the previous expr
+   (_> 1 (+ 4 _) (+ _ 2) (* _ _)) => 49 
+   (_> (+ 1 1) (* _ _)) => 4" 
+  `(let [~'_ ~init
+         ~@(mapcat (fn [x]
+                     `[~'_ ~x])
+                   body)]
+     ~'_))
+
+
+
 
