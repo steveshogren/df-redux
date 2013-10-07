@@ -75,7 +75,17 @@
         n
         (self (- n 1))))) 5)
 
+(defn roll-fate-die []
+  (- (rand-int 3) 1))
 
-
-
+(defn test-fate-percentages [rolls-count]
+  (let [rolls  (map (fn [x]
+                      (reduce + (map (fn [x] (roll-fate-die))
+                                     (range 4))))
+                    (range rolls-count))]
+    (map (fn [x] [(first x)
+                 (int (* 100 (/ (count (second x)) rolls-count)))])
+         (group-by (fn [x] x) rolls))))
+(test-fate-percentages 100000)
+;; => ([-1 19] [0 23] [1 19] [-2 12] [2 12] [-3 4] [3 4] [-4 1] [4 1])
 
