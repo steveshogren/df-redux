@@ -76,10 +76,9 @@
 (defn chance-fn [x]
   (> x (rand-int 100)))
 (defmacro chance [x]
-  (let [y (int (clojure.string/replace (str x) "x" ""))]
+  (let [y (Integer/parseInt (clojure.string/replace (str x) "%" ""))]
     `(chance-fn ~y)))
-
-(chance 50)
+;; (chance %50) => 
 
 (defmacro make-percents []
   "(ifN x y) returns x N% of the time, but ensures conditional evaluation, like 'if'"
