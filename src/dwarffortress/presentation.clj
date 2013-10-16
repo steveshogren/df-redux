@@ -83,19 +83,27 @@
 
 ;; Think about what you want it to look like _first_
 
-(if-chance 50% :a 45% :b 5% :c)
+(if-chance "50%" :a "45%" :b "5%" :c)
 
 (if-percent 50 :a, 45 :b, 5 :c)
 
 (if-percent [50 :a] [45 :b] [5 :c])
-(give-me [50 chance of :a]
-         [45 chance of :b]
-         [5 chance of :c])
-'(50 x)
 
+(return-a [50 chance-of :a]
+          [45 chance-of :b]
+          [5 chance-of :c])
 
+(if-hist ********** :a
+         ********* :b
+         * :c)
 
-
+(defmacro if-hist  [& n]
+  (if (even? (count n))
+    (let [pairs (partition 2 n)
+          pairs (mapcat (fn [[pct act]]
+                          [(-> pct str count (* 5)) `(fn [] ~act)])
+                        pairs)]
+      `(if-percent-fn ~@pairs))))
 
 (defn if-percent-fn [& n]
   "(if-percent-fn 50 (fn [] :a) 49 (fn [] :b) 1 (fn [] :c)) returns :a 50% of the time, :b 49%, and :c 1%"
