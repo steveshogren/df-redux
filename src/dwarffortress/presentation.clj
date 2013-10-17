@@ -97,13 +97,14 @@
          ********* :b
          * :c)
 
-(defmacro if-hist  [& n]
-  (if (even? (count n))
-    (let [pairs (partition 2 n)
-          pairs (mapcat (fn [[pct act]]
-                          [(-> pct str count (* 5)) `(fn [] ~act)])
-                        pairs)]
-      `(if-percent-fn ~@pairs))))
+;; So these are cool, but how do we make them work on seqs?
+(defmacro adder [x y] `(+ ~x ~y))
+(reduce adder 0 [4 5])
+;; => java.lang.RuntimeException: Can't take value of a macro: #'user/adder
+
+
+;; We make a regular function too
+(if-percent-fn 50 (fn [] :a) 49 (fn [] :b) 1 (fn [] :c))
 
 (defn if-percent-fn [& n]
   "(if-percent-fn 50 (fn [] :a) 49 (fn [] :b) 1 (fn [] :c)) returns :a 50% of the time, :b 49%, and :c 1%"
@@ -127,6 +128,15 @@
   (if (even? (count n))
     (let [pairs (partition 2 n)
           pairs (mapcat (fn [[pct act]] [pct `(fn [] ~act)]) pairs)]
+      `(if-percent-fn ~@pairs))))
+
+
+(defmacro if-hist  [& n]
+  (if (even? (count n))
+    (let [pairs (partition 2 n)
+          pairs (mapcat (fn [[pct act]]
+                          [(-> pct str count (* 5)) `(fn [] ~act)])
+                        pairs)]
       `(if-percent-fn ~@pairs))))
 
 #_(float (average (map (fn [x] (if-percent 50 0 50 100))
