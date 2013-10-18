@@ -87,24 +87,33 @@
 
 (if-percent 50 :a, 45 :b, 5 :c)
 
-(if-percent [50 :a] [45 :b] [5 :c])
+(if-percent-b [50 :a] [45 :b] [5 :c])
 
-(return-a [50 chance-of :a]
-          [45 chance-of :b]
-          [5 chance-of :c])
+(return-a 50 chance of :a
+          45 chance of :b
+          5 chance of :c)
 
-(if-hist ********** :a
-         ********* :b
-         * :c)
+(if-percent ********** :a
+            *********  :b
+            *          :c)
 
+
+
+            
 ;; So these are cool, but how do we make them work on seqs?
 (defmacro adder [x y] `(+ ~x ~y))
 (reduce adder 0 [4 5])
 ;; => java.lang.RuntimeException: Can't take value of a macro: #'user/adder
 
 
-;; We make a regular function too
-(if-percent-fn 50 (fn [] :a) 49 (fn [] :b) 1 (fn [] :c))
+
+
+
+;; We make a regular function syntax that might be unwieldy, but allowing at
+;; least the _ability_ to use over collections
+(if-percent-fn 50 (fn [] :a)
+               49 (fn [] :b)
+               1 (fn [] :c))
 
 (defn if-percent-fn [& n]
   "(if-percent-fn 50 (fn [] :a) 49 (fn [] :b) 1 (fn [] :c)) returns :a 50% of the time, :b 49%, and :c 1%"
@@ -123,23 +132,36 @@
                 (recur current-sum (rest items))))))
         (throw (Exception. (str "Nums: " sum " didn't equal 100" )))))))
 
+
+
+
+
+;; This frees us now to explore shorter or more expressive syntaxes
+
+
+
+
+
+(defn convert-to-num [x]
+  "(convert-to-num 5) => 5
+   (convert-to-num '**) => 10"
+  (if (number? x)
+    x
+    (-> x str count (* 5))))
+
 (defmacro if-percent [& n]
-  "(if-percent 50 :a 49 :b 1 :c) returns :a 50% of the time, :b 49%, and :c 1%"
-  (if (even? (count n))
-    (let [pairs (partition 2 n)
-          pairs (mapcat (fn [[pct act]] [pct `(fn [] ~act)]) pairs)]
-      `(if-percent-fn ~@pairs))))
-
-
-(defmacro if-hist  [& n]
+  "(if-percent 50 :a 49 :b 1 :c) returns :a 50% of the time, :b 49%, and :c 1%
+   (if-percent ********** :a
+               *********  :b
+               *          :c) => 50% :a, 45% :b, 5% :c "
   (if (even? (count n))
     (let [pairs (partition 2 n)
           pairs (mapcat (fn [[pct act]]
-                          [(-> pct str count (* 5)) `(fn [] ~act)])
-                        pairs)]
+                          [(convert-to-num pct) `(fn [] ~act)]) pairs)]
       `(if-percent-fn ~@pairs))))
 
-#_(float (average (map (fn [x] (if-percent 50 0 50 100))
+
+#_(float (average (map (fn [x] (if-percent 1 1 99 100))
                  (range 1000))))
 
 (defn average [col]
