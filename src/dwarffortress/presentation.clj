@@ -89,9 +89,11 @@
 
 (if-percent-b [50 :a] [45 :b] [5 :c])
 
-(return-a 50 chance of :a
-          45 chance of :b
-          5 chance of :c)
+(if-percent-c :a 50 :b 45 :c 5)
+
+(return-a 50 % chance of :a
+          45 % chance of :b
+          5 % chance of :c)
 
 (if-percent ********** :a
             *********  :b
@@ -106,9 +108,6 @@
 ;; => java.lang.RuntimeException: Can't take value of a macro: #'user/adder
 
 
-
-
-
 ;; We make a regular function syntax that might be unwieldy, but allowing at
 ;; least the _ability_ to use over collections
 (if-percent-fn 50 (fn [] :a)
@@ -116,7 +115,13 @@
                1 (fn [] :c))
 
 (defn if-percent-fn [& n]
-  "(if-percent-fn 50 (fn [] :a) 49 (fn [] :b) 1 (fn [] :c)) returns :a 50% of the time, :b 49%, and :c 1%"
+  " Takes a set of percent chances and return functions
+    to call if that 'chance' happens. All percents must
+    add up to 100, but any number are supported.
+   (if-percent-fn 50 (fn [] :a)
+                  49 (fn [] :b)
+                  1 (fn [] :c))
+    => returns :a 50% of the time, :b 49%, and :c 1%"
   (if (odd? (count n))
     (throw (Exception. "Must pass even num of args"))
     (let [pairs (partition 2 n)
@@ -157,7 +162,8 @@
   (if (even? (count n))
     (let [pairs (partition 2 n)
           pairs (mapcat (fn [[pct act]]
-                          [(convert-to-num pct) `(fn [] ~act)]) pairs)]
+                          [(convert-to-num pct) `(fn [] ~act)])
+                        pairs)]
       `(if-percent-fn ~@pairs))))
 
 
