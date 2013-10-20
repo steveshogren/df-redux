@@ -141,6 +141,7 @@
 
 
 
+
 ;; This frees us now to explore shorter or more expressive syntaxes
 
 
@@ -148,11 +149,8 @@
 
 
 (defn convert-to-num [x]
-  "(convert-to-num 5) => 5
-   (convert-to-num '**) => 10"
-  (if (number? x)
-    x
-    (-> x str count (* 5))))
+  (if (number? x) x
+      (-> x str count (* 5))))
 
 (defmacro if-percent [& n]
   "(if-percent 50 :a 49 :b 1 :c) returns :a 50% of the time, :b 49%, and :c 1%
@@ -167,8 +165,11 @@
       `(if-percent-fn ~@pairs))))
 
 
-#_(float (average (map (fn [x] (if-percent 1 1 99 100))
-                 (range 1000))))
+#_(->> (range 1000)
+       (map (fn [x] (if-percent 50 1 50 100)))
+       average 
+       float)
+
 
 (defn average [col]
   (let [sum (reduce + col)
@@ -177,15 +178,21 @@
 
 
 ;; ---- Anaphoric Macros ----
-(defmacro add-weird? [x]
+
+;; Here we shadow the z value with another
+(defmacro add-weird [x]
   `(let [~'z 100]
      ~x))
 (let [z 1]
-  (add-weird? (+ 1 z))) ;; => 101 ...not 2 
+  (add-weird (inc z))) ;; => 101 ...not 2 
+
+
 
 ;; Anaphoric macros allow the deliberate shadowing of
 ;; values when expanded. While dangerous, this can be
 ;; very useful in certain circumstances
+
+
 
 
 ;; _> is meant to "enhance" the value of the normal ->
@@ -193,11 +200,17 @@
 (defmacro _> [init & body]
   "Used to anaphorically replace _ with the result of the previous expr
    (_> 1 (+ 4 _) (+ _ 2) (* _ _)) => 49 
-   (_> (+ 1 1) (* _ _)) => 4" 
+   (_> (+ 1 1) (* _ _)) => 4 " 
   `(let [~'_ ~init
          ~@(mapcat (fn [x] `[~'_ ~x])
                    body)]
      ~'_))
+
+
+#_(_> (range 1000)
+      (map (fn [x] (if-percent 50 1 50 100)) _)
+      (average _) 
+      (float _))
 
 
 ;; Transliteration of PG's aif
