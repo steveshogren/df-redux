@@ -3,7 +3,7 @@
 ;; Think about templates for a second...
 <html>
   <p>
-  <?php> if(today_day() == "Monday") { echo("Mon")} <?/php>
+  <?php> if(today_day() == "Monday") { echo("Mon")} </?>
   </p>
 </html>
 
@@ -13,7 +13,18 @@
   </p>
 </html>
 
-;;They let you "disable/enable" the evaulation of code
+;;They let you "disable/enable" the evaulation of code,
+;; the template is what is returned, but first the code
+;; blocks are evaluated, allowing for expansion of the template
+
+<html>
+  <ul>
+  <% foreach (var person in people) {  %>
+     <li> <% person.name %> </li>
+  <% } %>
+  </ul>
+</html>
+
 
 ;; no quote                +   => #<core$_PLUS_ clojure.core$_PLUS_@d3d424c>
 ;; ' => quote             '+   => +
@@ -51,13 +62,9 @@
 ;; ---- Game probability macros ----
 
 ;; revert to just chance after figuring out what is wrong with '50% and '50x
-(defn chance-fn [x]
+(defn chance [x]
   (> x (rand-int 100)))
 
-(defmacro chance [x]
-  (let [y (Integer/parseInt (clojure.string/replace (str x) "%" ""))]
-    `(chance-fn ~y)))
-;; (chance %50) => (chance-fn 50)
 
 (defmacro make-percents []
   "(ifN x y) returns x N% of the time, but ensures conditional evaluation, like 'if'"
@@ -212,6 +219,11 @@
       (average _) 
       (float _))
 
+(pprint (macroexpand '(_> (range 1000)
+       (map (fn [x] (if-percent 50 1 50 100)) _)
+       (average _) 
+       (float _))))
+
 
 ;; Transliteration of PG's aif
 ;; Anaphoric macro that binds to "it" the test result
@@ -219,9 +231,9 @@
   `(let [~'it ~test]
      (if ~'it ~then ~else)))
 
-#_(aif 2
-     (do (print (str "it: " it)) it)
-     :false)
+#_(aif (+ 1 1) 
+        it
+       :some-return)
 ;;=> 2
 
 ;; Transliteration of PG's alambda
