@@ -27,9 +27,13 @@
   (and (is-two-of-a-kind cs) 
        (is-three-of-a-kind cs)))
 
+(defn is-flush [cs]
+  (apply = (map first cs)))
+
 (defn rank [cs]
   (let [cs (map identify cs)]
     (cond 
+          (is-flush cs) :flush
           (is-two-pair cs) :two-pair
           (is-full-house cs) :full-house
           (is-two-of-a-kind cs) :two-kind
@@ -44,6 +48,7 @@
  (= :three-kind (rank ["H7" "D7" "S7" "C5" "C8"]))
  (= :two-pair (rank ["H7" "D7" "S5" "C5" "C8"])) 
  (= :full-house (rank ["H7" "D7" "S7" "C5" "C5"])) 
+ (= :flush (rank ["H7" "H3" "H9" "H5" "H2"])) 
  (= :four-kind (rank ["H7" "D7" "S7" "C7" "C8"])))
 
 
