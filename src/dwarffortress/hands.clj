@@ -42,9 +42,14 @@
               sorted
               false)))
 
+(defn is-straight-flush [cs]
+  (and (is-straight cs)
+       (is-flush cs)))
+
 (defn rank [cs]
   (let [cs (map identify cs)]
     (cond 
+          (is-straight-flush cs) :straight-flush
           (is-flush cs) :flush
           (is-two-pair cs) :two-pair
           (is-straight cs) :straight
@@ -63,9 +68,8 @@
  (= :full-house (rank ["H7" "D7" "S7" "C5" "C5"])) 
  (= :flush (rank ["H7" "H3" "H9" "H5" "H2"])) 
  (= :straight (rank ["H3" "D7" "S5" "C6" "C4"])) 
+ (= :straight-flush (rank ["H3" "H7" "H5" "H6" "H4"])) 
  (= :four-kind (rank ["H7" "D7" "S7" "C7" "C8"])))
-
-
 
 (defmacro trace [n f]
   `(do
