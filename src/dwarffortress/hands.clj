@@ -23,12 +23,18 @@
 (defn is-two-pair [cs]
   (= 2 (count (is-x-of-a-kind cs 2))))
 
+(defn is-full-house [cs]
+  (and (is-two-of-a-kind cs) 
+       (is-three-of-a-kind cs)))
+
 (defn rank [cs]
   (let [cs (map identify cs)]
-    (cond (is-two-of-a-kind cs) :two-kind
+    (cond 
+          (is-two-pair cs) :two-pair
+          (is-full-house cs) :full-house
+          (is-two-of-a-kind cs) :two-kind
           (is-three-of-a-kind cs) :three-kind
           (is-four-of-a-kind cs) :four-kind
-          (is-two-pair cs) :two-pair
           :else :highcard)))
 
 (= 
@@ -37,6 +43,7 @@
  (= :highcard (rank ["H7" "D2" "S4" "C5" "C8"]))
  (= :three-kind (rank ["H7" "D7" "S7" "C5" "C8"]))
  (= :two-pair (rank ["H7" "D7" "S5" "C5" "C8"])) 
+ (= :full-house (rank ["H7" "D7" "S7" "C5" "C5"])) 
  (= :four-kind (rank ["H7" "D7" "S7" "C7" "C8"])))
 
 
