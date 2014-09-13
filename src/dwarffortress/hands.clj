@@ -82,17 +82,27 @@
           (is-four-of-a-kind cs) :four-kind
           :else :highcard)))
 
+(defn winner [h1 h2]
+  h2)
+
 ;; group-by, map, reduce, cond, if, range, sort, first, second, =, keyword, read-string, and
-(= 
- (= [:H 12] (identify "H12"))
- (= :two-kind (rank ["H2" "D2" "S4" "C5" "C8"]))
- (= :highcard (rank ["H7" "D2" "S4" "C5" "C8"]))
- (= :three-kind (rank ["H7" "D7" "S7" "C5" "C8"]))
- (= :two-pair (rank ["H7" "D7" "S5" "C5" "C8"])) 
- (= :full-house (rank ["H7" "D7" "S7" "C5" "C5"])) 
- (= :flush (rank ["H7" "H3" "H9" "H5" "H2"])) 
- (= :straight (rank ["H3" "D7" "S5" "C6" "C4"])) 
- (= :straight (rank ["H1" "D10" "S11" "C12" "C13"])) 
- (= :straight-flush (rank ["H3" "H7" "H5" "H6" "H4"])) 
- (= :four-kind (rank ["H7" "D7" "S7" "C7" "C8"])))
+(testing "" 
+  (is (= [:H 12] (identify "H12")))
+  (is (= [:D 2] (identify "D2")))
+
+  (is (= :two-kind (rank ["H2" "D2" "S4" "C5" "C8"])))
+  (is (= :highcard (rank ["H7" "D2" "S4" "C5" "C8"])))
+  (is (= :three-kind (rank ["H7" "D7" "S7" "C5" "C8"])))
+  (is (= :two-pair (rank ["H7" "D7" "S5" "C5" "C8"]))) 
+  (is (= :full-house (rank ["H7" "D7" "S7" "C5" "C5"]))) 
+  (is (= :flush (rank ["H7" "H3" "H9" "H5" "H2"]))) 
+  (is (= :straight (rank ["H3" "D7" "S5" "C6" "C4"]))) 
+  (is (= :straight (rank ["H1" "D10" "S11" "C12" "C13"]))) 
+  (is (= :straight-flush (rank ["H3" "H7" "H5" "H6" "H4"]))) 
+  (is (= :four-kind (rank ["H7" "D7" "S7" "C7" "C8"])))
+
+  (is (let [twokind (rank ["H2" "D2" "S4" "C5" "C8"])
+            fourkind (rank ["H7" "D7" "S7" "C7" "C8"])]
+        (= fourkind (winner twokind fourkind))))
+ )
 
