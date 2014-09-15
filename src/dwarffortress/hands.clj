@@ -73,15 +73,15 @@
 (defn ident [cs]
   (let [cs (map identify cs)]
     (cond 
-          (is-straight-flush cs) :straight-flush
-          (is-flush cs) :flush
-          (is-two-pair cs) :two-pair
-          (is-straight cs) :straight
-          (is-full-house cs) :full-house
-          (is-two-of-a-kind cs) :two-kind
-          (is-three-of-a-kind cs) :three-kind
-          (is-four-of-a-kind cs) :four-kind
-          :else :highcard)))
+     (is-straight-flush cs) [:straight-flush cs]
+     (is-flush cs) [:flush cs]
+     (is-two-pair cs) [:two-pair cs]
+     (is-straight cs) [:straight cs]
+     (is-full-house cs) [:full-house cs]
+     (is-two-of-a-kind cs) [:two-kind cs]
+     (is-three-of-a-kind cs) [:three-kind cs]
+     (is-four-of-a-kind cs) [:four-kind cs]
+     :else [:highcard cs])))
 
 (def handranks {:straight-flush 1 :four-kind 2 :full-house 3 :flush 4
                 :straight 5 :three-kind 6 :two-pair 7 :two-kind 8 :highcard 9})
