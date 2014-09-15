@@ -95,8 +95,9 @@
 ;; group-by, map, reduce, cond, if, range, sort, first, second, =, keyword, read-string, and
 (testing "Hand stuff" 
   (is (= [:H 12] (identify "H12")))
-  (is (= [:D 2] (identify "D2")))
+  (is (= [:D 2] (identify "D2"))))
 
+(testing "Hand identification"
   (is (= :two-kind (ident ["H2" "D2" "S4" "C5" "C8"])))
   (is (= :highcard (ident ["H7" "D2" "S4" "C5" "C8"])))
   (is (= :three-kind (ident ["H7" "D7" "S7" "C5" "C8"])))
@@ -106,13 +107,22 @@
   (is (= :straight (ident ["H3" "D7" "S5" "C6" "C4"]))) 
   (is (= :straight (ident ["H1" "D10" "S11" "C12" "C13"]))) 
   (is (= :straight-flush (ident ["H3" "H7" "H5" "H6" "H4"]))) 
-  (is (= :four-kind (ident ["H7" "D7" "S7" "C7" "C8"])))
+  (is (= :four-kind (ident ["H7" "D7" "S7" "C7" "C8"]))))
 
+(testing "Hank ranking"
   (is (let [twokind (ident ["H2" "D2" "S4" "C5" "C8"])
             fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
         (= fourkind (winner twokind fourkind))))
   (is (let [twokind (ident ["H2" "D2" "S4" "C5" "C8"])
             fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
         (= fourkind (winner fourkind twokind))))
- )
+  (is (let [fourkind-high (ident ["H9" "D9" "S9" "C9" "C8"])
+            fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
+        (= fourkind-high (winner fourkind fourkind-high))))
+  (is (let [fourkind-high (ident ["H9" "D9" "S9" "C9" "C8"])
+            fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
+        (= fourkind-high (winner fourkind-high fourkind))))
+
+  )
+ 
 
