@@ -86,11 +86,13 @@
 (def handranks {:straight-flush 1 :four-kind 2 :full-house 3 :flush 4
                 :straight 5 :three-kind 6 :two-pair 7 :two-kind 8 :highcard 9})
 
+(defn rank-same-hand )
 (defn winner [h1 h2]
   (tracelet [r1 ((first h1) handranks)
              r2 ((first h2) handranks)]
-            (if (> r1 r2)
-              h2 h1)))
+            (cond (> r1 r2) h2
+                  (< r1 r2) h1
+                  :else false )))
 
 ;; group-by, map, reduce, cond, if, range, sort, first, second, =, keyword, read-string, and
 (testing "Hand stuff" 
@@ -113,14 +115,17 @@
   (is (let [twokind (ident ["H2" "D2" "S4" "C5" "C8"])
             fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
         (= fourkind (winner twokind fourkind))))
+
   (is (let [twokind (ident ["H2" "D2" "S4" "C5" "C8"])
             fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
         (= fourkind (winner fourkind twokind))))
+
   (is (let [fourkind-high (ident ["H9" "D9" "S9" "C9" "C8"])
             fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
-        (= fourkind-high (winner fourkind fourkind-high))))
-  (is (let [fourkind-high (ident ["H9" "D9" "S9" "C9" "C8"])
-            fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
+        (= fourkind-high (winner fourkind fourkind-high)))) 
+
+  (is (let [fourkind-high (ident ["H7" "D7" "S7" "C7" "C8"])
+            fourkind (ident ["H9" "D9" "S9" "C9" "C8"])]
         (= fourkind-high (winner fourkind-high fourkind))))
 
   )
