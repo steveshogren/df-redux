@@ -87,8 +87,8 @@
                 :straight 5 :three-kind 6 :two-pair 7 :two-kind 8 :highcard 9})
 
 (defn winner [h1 h2]
-  (tracelet [r1 (h1 handranks)
-             r2 (h2 handranks)]
+  (tracelet [r1 ((first h1) handranks)
+             r2 ((first h2) handranks)]
             (if (> r1 r2)
               h2 h1)))
 
@@ -98,16 +98,16 @@
   (is (= [:D 2] (identify "D2"))))
 
 (testing "Hand identification"
-  (is (= :two-kind (ident ["H2" "D2" "S4" "C5" "C8"])))
-  (is (= :highcard (ident ["H7" "D2" "S4" "C5" "C8"])))
-  (is (= :three-kind (ident ["H7" "D7" "S7" "C5" "C8"])))
-  (is (= :two-pair (ident ["H7" "D7" "S5" "C5" "C8"]))) 
-  (is (= :full-house (ident ["H7" "D7" "S7" "C5" "C5"]))) 
-  (is (= :flush (ident ["H7" "H3" "H9" "H5" "H2"]))) 
-  (is (= :straight (ident ["H3" "D7" "S5" "C6" "C4"]))) 
-  (is (= :straight (ident ["H1" "D10" "S11" "C12" "C13"]))) 
-  (is (= :straight-flush (ident ["H3" "H7" "H5" "H6" "H4"]))) 
-  (is (= :four-kind (ident ["H7" "D7" "S7" "C7" "C8"]))))
+  (is (= :two-kind (first (ident ["H2" "D2" "S4" "C5" "C8"]))))
+  (is (= :highcard (first (ident ["H7" "D2" "S4" "C5" "C8"]))))
+  (is (= :three-kind (first (ident ["H7" "D7" "S7" "C5" "C8"]))))
+  (is (= :two-pair (first (ident ["H7" "D7" "S5" "C5" "C8"])))) 
+  (is (= :full-house (first (ident ["H7" "D7" "S7" "C5" "C5"])))) 
+  (is (= :flush (first (ident ["H7" "H3" "H9" "H5" "H2"])))) 
+  (is (= :straight (first (ident ["H3" "D7" "S5" "C6" "C4"])))) 
+  (is (= :straight (first (ident ["H1" "D10" "S11" "C12" "C13"])))) 
+  (is (= :straight-flush (first (ident ["H3" "H7" "H5" "H6" "H4"])))) 
+  (is (= :four-kind (first (ident ["H7" "D7" "S7" "C7" "C8"])))))
 
 (testing "Hank ranking"
   (is (let [twokind (ident ["H2" "D2" "S4" "C5" "C8"])
