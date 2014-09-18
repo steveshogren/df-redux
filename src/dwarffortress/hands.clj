@@ -14,6 +14,13 @@
         new-bindings (vec (mapcat wrap-args-with-trace arg-pairs))]
     `(let ~new-bindings ~@body)))
 
+
+
+
+
+
+
+
 (def suit-idents {:H 1 :S 2 :C 3 "D" 4})
 
 (defn identify [h]
@@ -22,24 +29,36 @@
     [suit num]))
 
 (defn is-x-of-a-kind [cs x]
-  (let [nums (map second cs)
+  (tracelet [nums (map second cs)
         grouped (group-by (fn [x] x) nums)
         grouped-counts (map (fn [[num list]] [(count list) num]) grouped)
-        twos (filter (fn [[count _]] (= x count)) grouped-counts)]
-    (if (empty? twos)
+        ns (filter (fn [[count _]] (= x count)) grouped-counts)]
+    (if (empty? ns)
       []
-      twos)))
+      ns)))
 
-(defn is-two-of-a-kind [cs] (= 1 (count (is-x-of-a-kind cs 2))))
-(defn is-three-of-a-kind [cs] (= 1 (count (is-x-of-a-kind cs 3)))) 
-(defn is-four-of-a-kind [cs] (= 1 (count (is-x-of-a-kind cs 4))))
+(defn is-two-of-a-kind [cs]
+  (let [pair-counts (is-x-of-a-kind cs 2)]
+    {:ismatch (= 1 (count pair-counts)) :high (second pair-counts)}))
+
+(defn is-three-of-a-kind [cs]
+  (let [pair-counts (is-x-of-a-kind cs 3)]
+    {:ismatch (= 1 (count pair-counts)) :high (second pair-counts)})) 
+
+(defn is-four-of-a-kind [cs]
+  (let [pair-counts (is-x-of-a-kind cs 4)]
+    {:ismatch (= 1 (count pair-counts)) :high (second pair-counts)}))
 
 (defn is-two-pair [cs]
-  (= 2 (count (is-x-of-a-kind cs 2))))
+  (let [pair-counts (is-x-of-a-kind cs 2)]
+    {:ismatch (= 2 (count pair-counts)) :high (max (map second pair-counts))}))
 
 (defn is-full-house [cs]
-  (and (is-two-of-a-kind cs) 
-       (is-three-of-a-kind cs)))
+  (let [two (is-two-of-a-kind cs) 
+        three (is-three-of-a-kind cs)]
+    {:ismatch (and (:ismatch two)
+                   (:ismatch three))
+     :high (max (map :high [two three]))}))
 
 (defn is-flush [cs]
   (apply = (map first cs)))
@@ -86,13 +105,15 @@
 (def handranks {:straight-flush 1 :four-kind 2 :full-house 3 :flush 4
                 :straight 5 :three-kind 6 :two-pair 7 :two-kind 8 :highcard 9})
 
-(defn rank-same-hand )
+(defn rank-same-hand [h1 h2]
+  false)
+
 (defn winner [h1 h2]
   (tracelet [r1 ((first h1) handranks)
              r2 ((first h2) handranks)]
             (cond (> r1 r2) h2
                   (< r1 r2) h1
-                  :else false )))
+                  :else (rank-same-hand h1 h2))))
 
 ;; group-by, map, reduce, cond, if, range, sort, first, second, =, keyword, read-string, and
 (testing "Hand stuff" 
@@ -120,13 +141,13 @@
             fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
         (= fourkind (winner fourkind twokind))))
 
-  (is (let [fourkind-high (ident ["H9" "D9" "S9" "C9" "C8"])
-            fourkind (ident ["H7" "D7" "S7" "C7" "C8"])]
-        (= fourkind-high (winner fourkind fourkind-high)))) 
+  (is (let [h (ident ["H9" "D9" "S9" "C9" "C8"])
+            l (ident ["H7" "D7" "S7" "C7" "C8"])]
+        (= h (winner h l)))) 
 
-  (is (let [fourkind-high (ident ["H7" "D7" "S7" "C7" "C8"])
-            fourkind (ident ["H9" "D9" "S9" "C9" "C8"])]
-        (= fourkind-high (winner fourkind-high fourkind))))
+  (is (let [l (ident ["H7" "D7" "S7" "C7" "C8"])
+            h (ident ["H9" "D9" "S9" "C9" "C8"])]
+        (= h (winner l h))))
 
   )
  
