@@ -6,10 +6,12 @@
         [dwarffortress.map]
         [dwarffortress.percentages]
         [seesaw.core])
+  (:require [dwarffortress.percentages :as p])
   (:gen-class))
 ;;(use 'seesaw.core)
 ;;(use 'seesaw.dev)
 ;;(show-options (grid-panel))  
+
 
 (defn -main
   [& args]

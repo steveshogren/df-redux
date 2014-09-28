@@ -5,5 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [deft "0.1.1"]
-                 [seesaw "1.4.3"]]
+                 [seesaw "1.4.3"]
+                 [midje "1.6.3"]]
+  :plugins [[lein-midje "3.1.1"]
+            [cider/cider-nrepl "0.7.0"]]
   :main dwarffortress.core)
