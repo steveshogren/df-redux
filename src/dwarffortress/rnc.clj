@@ -13,9 +13,12 @@
         new-bindings (vec (mapcat wrap-args-with-trace arg-pairs))]
     `(let ~new-bindings ~@body)))
 
-(defn parse [s]
-  (cond (= "I" s) 1
-        (= "V" s) 5
-        (= "X" s) 10
+(defn parse-single [s]
+  (cond (= \I s) 1
+        (= \V s) 5
+        (= \X s) 10
         :else 0))
+
+(defn parse [s]
+  (reduce + (map parse-single (seq s))))
 
