@@ -1,35 +1,31 @@
-(ns dwarffortress.rnc)
-
-(defmacro trace [n f]
-  `(do
-     (println ~n ":" ~f)
-     ~f))
-
-(defn wrap-args-with-trace [[symb val]]
-  [symb (list `trace (str "let-" symb) val)])
-
-(defmacro tracelet [args & body]
-  (let [arg-pairs (partition 2 args)
-        new-bindings (vec (mapcat wrap-args-with-trace arg-pairs))]
-    `(let ~new-bindings ~@body)))
+(ns dwarffortress.rnc
+  (:require [dwarffortress.trace :refer [trace tracelet]]))
 
 (def nums {\I 1 \V 5 \X 10})
 
-(defn parse-single [s]
-  (get nums s))
+(defn parse-single [c] (get nums c))
+
+(defn parse-pair [[f s]] (if (< f s) (- s f) s))
 
 (defn parse-doubles [s]
-  (tracelet [pairs (partition 2 1 (map parse-single (seq s)))
+  (let [pairs (partition 2 1 (map parse-single (seq s)))
         [f s] (first pairs)
-        first-val (if (> f s) f 0)
-        rest-vals (map (fn [[f s]] (if (< f s) (- s f) s)) pairs)]
-    (reduce + first-val rest-vals)))
+        first-val (if (>= f s) f 0)
+        rest-vals (map parse-pair pairs)]
+     (reduce + first-val rest-vals)))
+
+(defn valid? [s]
+  (let [quads (partition 4 1 (seq s))]
+    (reduce (fn [acc next]
+              ;; Ensure no 4x repeated characters
+              (and (apply not= next)
+                   acc))
+            true
+            quads)))
 
 (defn parse [s]
-  (if (= 1 (count s))
-    (reduce + (map parse-single (seq s)))
-    (parse-doubles s)))
-
-;; (parse "")
+  (cond (not (valid? s)) 0
+        (= 1 (count s)) (parse-single (first (seq s)))
+        :else (parse-doubles s)))
 
 
