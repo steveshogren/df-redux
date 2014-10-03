@@ -13,5 +13,10 @@
        (fact "" (r/parse "XX") => 20)
        (fact "" (r/parse "XXXX") => 0)
        )
+(facts "To Roman"
+       (fact "" (r/to-roman 1) => "I")
+       (fact "" (r/to-roman 5) => "V")
+       (fact "" (r/to-roman 10) => "X")
+       )
 
 

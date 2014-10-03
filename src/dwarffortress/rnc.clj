@@ -2,6 +2,7 @@
   (:require [dwarffortress.trace :refer [trace tracelet]]))
 
 (def nums {\I 1 \V 5 \X 10})
+(def num-s {1 \I 5 \V 10 \X})
 
 (defn parse-single [c] (get nums c))
 
@@ -27,5 +28,9 @@
   (cond (not (valid? s)) 0
         (= 1 (count s)) (parse-single (first (seq s)))
         :else (parse-doubles s)))
+
+
+(defn to-roman [i]
+  (str (get num-s i)))
 
 
