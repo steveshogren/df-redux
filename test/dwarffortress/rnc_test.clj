@@ -17,6 +17,10 @@
        (fact "" (r/to-roman 1) => "I")
        (fact "" (r/to-roman 5) => "V")
        (fact "" (r/to-roman 10) => "X")
+       (fact "" (r/to-roman 3) => "III")
+       (fact "" (r/to-roman 15) => "XV")
+       (fact "" (r/to-roman 30) => "XXX")
+       (fact "" (r/to-roman 18) => "XVIII")
        )
 
 

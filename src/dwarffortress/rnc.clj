@@ -2,7 +2,7 @@
   (:require [dwarffortress.trace :refer [trace tracelet]]))
 
 (def nums {\I 1 \V 5 \X 10})
-(def num-s {1 \I 5 \V 10 \X})
+(def num-s {1 "I" 5 "V" 10 "X"})
 
 (defn parse-single [c] (get nums c))
 
@@ -29,8 +29,22 @@
         (= 1 (count s)) (parse-single (first (seq s)))
         :else (parse-doubles s)))
 
+(defn find-smaller [i]
+  (apply max (filter #(< % i) (keys num-s))))
+
 
 (defn to-roman [i]
-  (str (get num-s i)))
+  (let [single (get num-s i)]
+    (if single single
+        (loop [remaining i
+               accum ""]
+          (if (= 0 remaining)
+            accum
+            (let [match (get num-s remaining)]
+              (if match (str accum match)
+                  (let [smaller (find-smaller remaining)]
+                    (recur (- remaining smaller)
+                           (str accum (get num-s smaller)))))))))))
+
 
 
