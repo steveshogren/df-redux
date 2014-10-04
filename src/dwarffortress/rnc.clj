@@ -32,19 +32,21 @@
 (defn find-smaller [i]
   (apply max (filter #(< % i) (keys num-s))))
 
+(defn get-roman [i] (get num-s i))
+
+(defn to-roman-multiple [i]
+  (loop [remaining i
+         accum ""]
+    (if (= 0 remaining)
+      accum
+      (if-let [match (get-roman remaining)]
+        (str accum match)
+        (let [smaller (find-smaller remaining)]
+          (recur (- remaining smaller)
+                 (str accum (get-roman smaller))))))))
 
 (defn to-roman [i]
-  (let [single (get num-s i)]
+  (let [single (get-roman i)]
     (if single single
-        (loop [remaining i
-               accum ""]
-          (if (= 0 remaining)
-            accum
-            (let [match (get num-s remaining)]
-              (if match (str accum match)
-                  (let [smaller (find-smaller remaining)]
-                    (recur (- remaining smaller)
-                           (str accum (get num-s smaller)))))))))))
-
-
+        (to-roman-multiple i))))
 
