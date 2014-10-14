@@ -45,10 +45,16 @@
 (defn get-expected-date-map [in-past]
   (map #(get-date-add-days (- %)) (range in-past)))
 
-(def git-d (map get-day-from-date (map #(from-unix-time (* 1000 (parseLong %)))
-                                       (getGitLogs "/home/jack/programming/dwarffortress/.git/")))) 
+(defn get-dates-from-dir [dir]
+  (map get-day-from-date (map #(from-unix-time (* 1000 (parseLong %)))
+                              (getGitLogs dir))))
+
+(def git-d (dates-by-day (mapcat #(get-dates-from-dir %)
+                                 (get-git-paths)))) 
 
 (def expect-d (dates-by-day (get-expected-date-map 10))) 
 
-(dates-by-day git-d)
+(let [expected-days ((comp reverse sort) (keys expect-d))
+      act-days ((comp reverse sort) (keys git-d))]
+  act-days)
 
