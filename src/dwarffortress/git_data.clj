@@ -19,7 +19,7 @@
 (defn get-git-logs [place]
   (-> (sh "git"
           (str "--git-dir=" place)
-          "log" "-7"
+          "log" ;; "-7"
           "--pretty=format:\"%at\"")
       :out 
       (s/replace "\"" "")
@@ -53,12 +53,10 @@
   (map #(get-date-add-days (- %)) (range in-past)))
 
 (defn get-dates-from-dir [dir]
-  (map get-day-from-date (map #(from-unix-time (* 1000 (parse-long %)))
-                              (get-git-logs dir))))
-
-  (mapcat #(get-dates-from-dir %)
-            (conj (get-git-paths)
-                  "/home/jack/.emacs.d/.git"))
+  (map get-day-from-date
+       (filter #(= current-year (get-year %))
+               (map #(from-unix-time (* 1000 (parse-long %)))
+                    (get-git-logs dir)))))
 
 (def git-d (dates-by-day (mapcat #(get-dates-from-dir %)
                                  (conj (get-git-paths)
@@ -69,6 +67,6 @@
   (filter (fn [[k v]] (= current-year (get-year v))) dates))
 
 (let [expected-days (take 15 ((comp reverse sort) (keys (only-this-years expect-d))))
-      act-days (take 15 ((comp reverse sort) (keys (only-this-years git-d))))]
+      act-days (take 15 ((comp reverse sort) (keys git-d)))]
   [expected-days act-days])
 
