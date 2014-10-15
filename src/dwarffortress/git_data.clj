@@ -7,7 +7,7 @@
 
 (defn from-unix-time [t]
   (java.util.Date. t))
-(defn parseLong [s]
+(defn parse-long [s]
   (Long/parseLong s))
 
 (defn get-git-paths []
@@ -16,13 +16,21 @@
                             (.endsWith (.getName x) ".git")))
                (file-seq (io/file "/home/jack/programming")))))
 
-(defn getGitLogs [place]
-  (s/split (s/replace (:out (sh "git"
-                                (str "--git-dir=" place)
-                                "log" "-7"
-                                "--pretty=format:\"%at\""))
-                      "\"" "")
-           #"\n"))
+(defn get-git-logs [place]
+  (-> (sh "git"
+          (str "--git-dir=" place)
+          "log" "-7"
+          "--pretty=format:\"%at\"")
+      :out 
+      (s/replace "\"" "")
+      (s/split #"\n")))
+
+(defn get-year [d]
+  (let [cal (Calendar/getInstance)]
+    (.setTime cal d)
+    (.get cal java.util.Calendar/YEAR)))
+
+(def current-year (get-year (Date.)))
 
 (defn get-day-from-date
   ([d] (get-day-from-date d 0))
@@ -37,8 +45,7 @@
   (get-day-from-date (Date.) days))
 
 (defn dates-by-day [date-lists]
-  (reduce (fn [ac ne] 
-            (assoc ac (:day ne) (:date ne)))
+  (reduce (fn [ac ne] (assoc ac (:day ne) (:date ne)))
           {}
           date-lists))
 
@@ -46,15 +53,22 @@
   (map #(get-date-add-days (- %)) (range in-past)))
 
 (defn get-dates-from-dir [dir]
-  (map get-day-from-date (map #(from-unix-time (* 1000 (parseLong %)))
-                              (getGitLogs dir))))
+  (map get-day-from-date (map #(from-unix-time (* 1000 (parse-long %)))
+                              (get-git-logs dir))))
+
+  (mapcat #(get-dates-from-dir %)
+            (conj (get-git-paths)
+                  "/home/jack/.emacs.d/.git"))
 
 (def git-d (dates-by-day (mapcat #(get-dates-from-dir %)
-                                 (get-git-paths)))) 
+                                 (conj (get-git-paths)
+                                       "/home/jack/.emacs.d/.git")))) 
+(def expect-d (dates-by-day (get-expected-date-map 15))) 
 
-(def expect-d (dates-by-day (get-expected-date-map 10))) 
+(defn only-this-years [dates]
+  (filter (fn [[k v]] (= current-year (get-year v))) dates))
 
-(let [expected-days ((comp reverse sort) (keys expect-d))
-      act-days ((comp reverse sort) (keys git-d))]
-  act-days)
+(let [expected-days (take 15 ((comp reverse sort) (keys (only-this-years expect-d))))
+      act-days (take 15 ((comp reverse sort) (keys (only-this-years git-d))))]
+  [expected-days act-days])
 
