@@ -66,7 +66,16 @@
 (defn only-this-years [dates]
   (filter (fn [[k v]] (= current-year (get-year v))) dates))
 
-(let [expected-days (take 15 ((comp reverse sort) (keys (only-this-years expect-d))))
-      act-days (take 15 ((comp reverse sort) (keys git-d)))]
-  [expected-days act-days])
+(defn get-last-x-days [day-map num]
+  (reverse (take num ((comp reverse sort) (keys day-map)))))
 
+(let [expected-days (get-last-x-days (only-this-years expect-d) 15) 
+      act-days (get-last-x-days git-d 15)]
+  [expected-days act-days]
+  )
+(keys (filter (fn [[day dates]]
+                (= 1 (count dates))) ))
+(group-by (fn [x] x) 
+          (concat (range 5 10)
+                  [1 3 5 7 10]))
+(into (set (range 5 10)) [1 3 5 7 10])
