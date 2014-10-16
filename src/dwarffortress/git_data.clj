@@ -3,6 +3,7 @@
            [java.util Calendar])
   (:require [clojure.string :as s]
             [clojure.java.io :as io]
+            [clojure.set :as set]
             [clojure.java.shell :refer [sh]]))
 
 (defn from-unix-time [t]
@@ -32,8 +33,8 @@
 
 (def current-year (get-year (Date.)))
 
-(defn get-day-from-date
-  ([d] (get-day-from-date d 0))
+(defn get-day-map-from-date 
+  ([d] (get-day-map-from-date d 0))
   ([d days-back]
      (let [cal (Calendar/getInstance)]
        (.setTime cal d)
@@ -42,7 +43,7 @@
         :date (.getTime cal)})))
 
 (defn get-date-add-days [days]
-  (get-day-from-date (Date.) days))
+  (get-day-map-from-date (Date.) days))
 
 (defn dates-by-day [date-lists]
   (reduce (fn [ac ne] (assoc ac (:day ne) (:date ne)))
@@ -53,15 +54,10 @@
   (map #(get-date-add-days (- %)) (range in-past)))
 
 (defn get-dates-from-dir [dir]
-  (map get-day-from-date
+  (map get-day-map-from-date
        (filter #(= current-year (get-year %))
                (map #(from-unix-time (* 1000 (parse-long %)))
                     (get-git-logs dir)))))
-
-(def git-d (dates-by-day (mapcat #(get-dates-from-dir %)
-                                 (conj (get-git-paths)
-                                       "/home/jack/.emacs.d/.git")))) 
-(def expect-d (dates-by-day (get-expected-date-map 15))) 
 
 (defn only-this-years [dates]
   (filter (fn [[k v]] (= current-year (get-year v))) dates))
@@ -69,13 +65,18 @@
 (defn get-last-x-days [day-map num]
   (reverse (take num ((comp reverse sort) (keys day-map)))))
 
-(let [expected-days (get-last-x-days (only-this-years expect-d) 15) 
-      act-days (get-last-x-days git-d 15)]
-  [expected-days act-days]
-  )
-(keys (filter (fn [[day dates]]
-                (= 1 (count dates))) ))
-(group-by (fn [x] x) 
-          (concat (range 5 10)
-                  [1 3 5 7 10]))
-(into (set (range 5 10)) [1 3 5 7 10])
+
+
+(defn find-missing-days [days-back]
+  (let [expected-days-map (dates-by-day (get-expected-date-map days-back))
+        git-dates (dates-by-day (mapcat #(get-dates-from-dir %)
+                                    (conj (get-git-paths)
+                                          "/home/jack/.emacs.d/.git")))
+        expected-days (get-last-x-days (only-this-years expected-days-map) days-back) 
+        act-days (get-last-x-days git-dates days-back)
+        missing-days (set/difference (set expected-days) (set act-days))]
+    (if (seq? missing-days)
+      (let [earliest-missing (apply min missing-days)]
+        (get expected-days-map earliest-missing)))))
+
+(find-missing-days 20)
