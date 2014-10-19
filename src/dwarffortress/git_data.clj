@@ -12,10 +12,9 @@
             [clj-time.coerce :as c]
             [clojure.java.shell :refer [sh]]))
 
-(l/local-now)
-
 (defn from-unix-time [t]
   (java.util.Date. t))
+
 (defn parse-long [s]
   (Long/parseLong s))
 
@@ -89,7 +88,7 @@
   (reverse (take num ((comp reverse sort) (keys day-map)))))
 
 (defn find-missing-days [days-back]
-  (tracelet [expected-days-map (group-dates-by-day (get-expected-date-map days-back))
+  (let [expected-days-map (group-dates-by-day (get-expected-date-map days-back))
         git-dates (group-dates-by-day (mapcat #(get-dates-from-dir %)
                                               (conj (get-git-paths)
                                                     "/home/jack/.emacs.d/.git")))
