@@ -50,8 +50,6 @@
       ;; (.add cal java.util.Calendar/MINUTE inc-time-by)
       (.getTime cal))))
 
-(add-days-to-date 1 (Date.))
-
 (defn get-day-map-from-date 
   ([d] (get-day-map-from-date d 0))
   ([d days-back]
@@ -65,15 +63,13 @@
   (get-day-map-from-date (Date.) days))
 
 (defn group-dates-by-day [date-lists]
+  (println "Grouping dates...")
   (reduce (fn [ac ne] (assoc ac (:day ne) (:date ne)))
           {}
           date-lists))
 
 (defn get-expected-date-map [in-past]
   (map #(get-date-add-days (- %)) (range in-past)))
-
-(map #(c/from-long (* 1000 (parse-long %)))
-     (get-git-logs "/home/jack/programming/clojadelphia-macros/.git/"))
 
 (defn get-dates-from-dir [dir]
   (map get-day-map-from-date
@@ -99,5 +95,9 @@
       (let [earliest-missing (apply min missing-days)]
         (get expected-days-map earliest-missing)))))
 
-(find-missing-days 20)
-
+(defn main [& args]
+  (println "Checking history...")
+  (if-let [days (find-missing-days 20)]
+    (println "First missing day:" days)
+    (println "No gaps found"))
+  (System/exit 0))

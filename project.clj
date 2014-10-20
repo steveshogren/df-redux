@@ -11,4 +11,5 @@
                  [midje "1.6.3"]]
   :plugins [[lein-midje "3.1.1"]
             [cider/cider-nrepl "0.7.0"]]
+  :aliases {"gitcheck" ["run" "-m" "dwarffortress.git-data/main"]}
   :main dwarffortress.core)
