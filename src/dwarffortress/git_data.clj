@@ -1,16 +1,11 @@
 (ns dwarffortress.git-data
-  (:require [clojure.string :as s]
-            [clojure.java.io :as io]
-            [clojure.set :as set]
+  (:import [java.util Date]
+           [java.util Calendar])
+  (:require [clojure.set :as set]
             [clojure.tools.trace :refer [trace]]
             [dwarffortress.trace :refer [tracelet]]
             [dwarffortress.util.git :as git]
-            [dwarffortress.util.dates :as dates]
-            [clj-time.core :as t]
-            [clj-time.local :as l]
-            [clj-time.format :as f]
-            [clj-time.coerce :as c]
-            [clojure.java.shell :refer [sh]]))
+            [dwarffortress.util.dates :as dates]))
 
 (defn get-day-map-from-date 
   ([d] (get-day-map-from-date d 0))
@@ -20,7 +15,6 @@
        (.add cal Calendar/DATE days-back)
        {:day (.get cal Calendar/DAY_OF_YEAR)
         :date (.getTime cal)})))
-
 
 (defn get-date-add-days [days]
   (get-day-map-from-date (Date.) days))
@@ -53,14 +47,35 @@
                                                     "/home/jack/.emacs.d/.git")))
         expected-days (get-last-x-days (only-this-years expected-days-map) days-back) 
         actual-days (get-last-x-days git-dates days-back)
-        missing-days (set/difference (set expected-days) (set actual-days))]
+        missing-days (set/difference (set expected-days) (set actual-days))
+        missing-days-and-date (map (fn [day-num] [day-num (get expected-days-map day-num)]) missing-days)]
+    {:missing missing-days-and-date :expected expected-days-map}
+    ))
+
+(defn find-first-missing-date [days-back]
+  (let [missing-days (find-missing-days days-back)]
     (when (not-empty missing-days)
-      (let [earliest-missing (apply min missing-days)]
-        (get expected-days-map earliest-missing)))))
+      (let [earliest-missing (first (sort-by first (:missing missing-days)))]
+        (second earliest-missing)))))
 
 (defn main [& args]
   (println "Checking history...")
-  (if-let [days (find-missing-days 20)]
+  (if-let [days (find-first-missing-date 20)]
     (println "First missing day:" days)
     (println "No gaps found"))
   (System/exit 0))
+
+(defn includes? [col item]
+  (some #{item} col))
+
+(defn gui []
+  (tracelet [days (find-missing-days 20)
+             expected (sort (keys (:expected days)))
+             missing (map first (:missing days))]
+            (doall (vec (map (fn [exp] 
+                               (if (includes? missing exp)  
+                                 (print "_")
+                                 (print "X"))) 
+                             expected)))))
+
+(gui)
