@@ -20,7 +20,6 @@
   (get-day-map-from-date (Date.) days))
 
 (defn group-dates-by-day [date-lists]
-  (println "Grouping dates...")
   (reduce (fn [ac ne] (assoc ac (:day ne) (:date ne)))
           {}
           date-lists))
@@ -59,7 +58,6 @@
         (second earliest-missing)))))
 
 (defn main [& args]
-  (println "Checking history...")
   (if-let [days (find-first-missing-date 20)]
     (println "First missing day:" days)
     (println "No gaps found"))
@@ -69,13 +67,14 @@
   (some #{item} col))
 
 (defn gui []
-  (tracelet [days (find-missing-days 20)
-             expected (sort (keys (:expected days)))
-             missing (map first (:missing days))]
-            (doall (vec (map (fn [exp] 
-                               (if (includes? missing exp)  
-                                 (print "_")
-                                 (print "X"))) 
-                             expected)))))
+  (let [days (find-missing-days 20)
+        expected (sort (keys (:expected days)))
+        missing (map first (:missing days))]
+    (doall (vec (map (fn [exp] 
+                       (if (includes? missing exp)  
+                         (print "_")
+                         (print "X"))) 
+                     expected)))))
 
-(gui)
+;; (gui)
+
