@@ -66,15 +66,16 @@
 (defn includes? [col item]
   (some #{item} col))
 
-(defn gui []
+(defn gui [& args]
   (let [days (find-missing-days 20)
         expected (sort (keys (:expected days)))
         missing (map first (:missing days))]
-    (doall (vec (map (fn [exp] 
-                       (if (includes? missing exp)  
-                         (print "_")
-                         (print "X"))) 
-                     expected)))))
+    (spit "guifile"
+          (with-out-str
+            (println (reduce #(str %1 (if (includes? missing %2) "_" "X"))
+                             ""
+                             expected)))))
+  (System/exit 0))
 
 ;; (gui)
 

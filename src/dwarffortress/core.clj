@@ -5,7 +5,7 @@
         [dwarffortress.dwarf]
         [dwarffortress.map]
         [dwarffortress.percentages]
-        [seesaw.core])
+        #_[seesaw.core])
   (:require [dwarffortress.percentages :as p])
   (:gen-class))
 ;;(use 'seesaw.core)
@@ -27,9 +27,9 @@
          pack!
          show!))
     #_(let [inp (read-line)]
-      (recur map (update-dwarf dwarf map) 
-             (case inp
-               "p" (if (= 9 level) level (+ 1 level))
-               "n" (if (= 0 level) level (- 1 level))
-               level)))))
+        (recur map (update-dwarf dwarf map) 
+               (case inp
+                 "p" (if (= 9 level) level (+ 1 level))
+                 "n" (if (= 0 level) level (- 1 level))
+                 level)))))
 
