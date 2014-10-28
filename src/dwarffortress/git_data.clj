@@ -70,11 +70,9 @@
   (let [days (find-missing-days 20)
         expected (sort (keys (:expected days)))
         missing (map first (:missing days))]
-    (spit "guifile"
-          (with-out-str
-            (println (reduce #(str %1 (if (includes? missing %2) "_" "X"))
-                             ""
-                             expected)))))
+    (println (reduce #(str %1 (if (includes? missing %2) "_" "X"))
+                     ""
+                     expected)))
   (System/exit 0))
 
 ;; (gui)
