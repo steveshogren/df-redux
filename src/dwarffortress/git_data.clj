@@ -67,7 +67,7 @@
   (some #{item} col))
 
 (defn gui [& args]
-  (let [days (find-missing-days 20)
+  (let [days (find-missing-days 10)
         expected (sort (keys (:expected days)))
         missing (map first (:missing days))]
     (println (reduce #(str %1 (if (includes? missing %2) "_" "X"))
