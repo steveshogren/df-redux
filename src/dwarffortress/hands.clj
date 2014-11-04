@@ -14,12 +14,10 @@
         new-bindings (vec (mapcat wrap-args-with-trace arg-pairs))]
     `(let ~new-bindings ~@body)))
 
-
-
-
-
-
-
+;; Windows         - "Default setup"
+;; Cider           - "Connection stuff"
+;; Evil/Paredit    - "Amazing Parens"
+;; Company         - "DONE"
 
 (def suit-idents {:H 1 :S 2 :C 3 "D" 4})
 
@@ -30,12 +28,12 @@
 
 (defn is-x-of-a-kind [cs x]
   (tracelet [nums (map second cs)
-        grouped (group-by (fn [x] x) nums)
-        grouped-counts (map (fn [[num list]] [(count list) num]) grouped)
-        ns (filter (fn [[count _]] (= x count)) grouped-counts)]
-    (if (empty? ns)
-      []
-      ns)))
+             grouped (group-by (fn [x] x) nums)
+             grouped-counts (map (fn [[num list]] [(count list) num]) grouped)
+             ns (filter (fn [[count _]] (= x count)) grouped-counts)]
+            (if (empty? ns)
+              []
+              ns)))
 
 (defn is-two-of-a-kind [cs]
   (let [pair-counts (is-x-of-a-kind cs 2)]
@@ -65,23 +63,23 @@
 
 (defn i-is-straight [nums]
   (let [sorted (sort nums)
-             start-num (first sorted)
-             expected-straight (range start-num (+ 5 start-num))
-             match? (reduce (fn [x y] (and (= true x)
-                                           (= x y)))
-                            (map = sorted expected-straight))]
-            (if match?
-              sorted
-              false)))
+        start-num (first sorted)
+        expected-straight (range start-num (+ 5 start-num))
+        match? (reduce (fn [x y] (and (= true x)
+                                      (= x y)))
+                       (map = sorted expected-straight))]
+    (if match?
+      sorted
+      false)))
 
 (defn is-straight [cs]
   (let [nums (map second cs)]
     (if (= 1 (count (filter #(= 1 %) nums)))
       (let [low-ace (i-is-straight nums)
-                 high-ace (i-is-straight (conj (filter #(not= 1 %) nums) 14))]
-                (cond low-ace low-ace
-                      high-ace high-ace
-                      :else false))
+            high-ace (i-is-straight (conj (filter #(not= 1 %) nums) 14))]
+        (cond low-ace low-ace
+              high-ace high-ace
+              :else false))
       (i-is-straight nums))))
 
 
@@ -150,5 +148,5 @@
         (= h (winner l h))))
 
   )
- 
+
 
