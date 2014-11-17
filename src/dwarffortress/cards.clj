@@ -18,7 +18,12 @@
      (pct-of (:pawn-shop location-cards) count) :pawn-shop 
      (pct-of (:gas-station location-cards) count) :gas-station)))
 
-(p/if-percent [50 :a 50 :b])
+(defn next-card [card-list]
+  (let [keys (keys card-list)
+        count (reduce + (vals card-list))
+        cards (mapcat (fn [k] [(pct-of (k card-list) count) (fn [] k)])
+                      keys)]
+    (apply p/if-percent-fn cards)))
 
 (def item-cards {
                  :baricade-hearts-8 2
