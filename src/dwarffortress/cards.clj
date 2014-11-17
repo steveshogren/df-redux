@@ -76,3 +76,31 @@
 (defn next-action-card []
   (next-card action-cards))
 
+;; (get-next-location)
+(defn get-next-location []
+  (let [l (next-location)]
+    (assoc (l location-cards) :type l)))
+
+;; (make-hand)
+(defn make-hand []
+  (map (fn [x] (next-action-card)) (range 3)))
+
+(defn start-game []
+  {:defense (:cost (get-next-location))
+   :scavange-places [(get-next-location)
+                     (get-next-location)
+                     (get-next-location)]
+   :items []
+   :zombies 0
+   :player-actions {:p1 (make-hand)
+                    :p2 (make-hand)
+                    :p3 (make-hand)
+                    :p4 (make-hand)}})
+
+(def game (start-game))
+
+(defn play-day [game]
+  (loop [game game]
+    (println "test")))
+
+(play-day game)
